@@ -1,11 +1,12 @@
 import { Link } from "react-router";
 import { Flex } from "@chakra-ui/react";
-// import MenuItem from "./MenuItem";
 
 export default function Menu(){
     return (
-        <Flex gap="15px" my="30px" color="black">
+        <Flex color={"black"} fontSize="16px" fontWeight={"medium"} gap="15px" my="30px">
+            <Link to="/">Все фильмы</Link>
             <Link to="/saved">Избранное</Link>
         </Flex>
     )
 }
+
