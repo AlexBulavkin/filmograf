@@ -1,5 +1,5 @@
-import { Box, Flex, Icon, Text } from "@chakra-ui/react";
-import { IoMdCheckmarkCircle } from "react-icons/io";
+import { Flex } from "@chakra-ui/react";
+import { Checkbox } from "@chakra-ui/react"
 import { useState } from "react";
 import genresList from "./genresList";
 
@@ -10,10 +10,13 @@ export default function Filters(){
             {filters.map((filter) => (
                 <Flex key={filter.id} align={"center"} gap={'10px'}>
                     <Flex gap={'5px'}>
-                    <Icon color={"#EA580B"}>
-                        <IoMdCheckmarkCircle />
-                    </Icon>
-                    <Text color="black" fontSize="16px" fontWeight={"medium"}>{filter.title}</Text>
+                        <Checkbox.Root defaultChecked colorPalette={`${filter.color}`}>
+                        <Checkbox.HiddenInput />
+                        <Checkbox.Control rounded={"full"} >
+                            <Checkbox.Indicator />
+                        </Checkbox.Control>
+                        <Checkbox.Label fontSize={"16px"} fontWeight={"medium"}> {filter.title} </Checkbox.Label>
+                        </Checkbox.Root>
                     </Flex>
                 </Flex>
             ))}

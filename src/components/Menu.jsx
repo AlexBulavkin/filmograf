@@ -6,6 +6,7 @@ export default function Menu(){
         <Flex color={"black"} fontSize="16px" fontWeight={"medium"} gap="15px" my="30px">
             <Link to="/">Все фильмы</Link>
             <Link to="/saved">Избранное</Link>
+            <Link to="/add">Добавить фильм</Link>
         </Flex>
     )
 }

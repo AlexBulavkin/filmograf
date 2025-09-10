@@ -7,7 +7,7 @@ import { Box, Center } from '@chakra-ui/react'
 export default function App() {
   return (
     <>
-    <Center bg="white">
+    <Center>
       <Box w="1172px">
         <Menu />
         <Outlet />   
