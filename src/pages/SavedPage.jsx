@@ -14,7 +14,6 @@ export default function SavedPage() {
           alt="Постер"
           />
         </Flex>
-
       </Flex>
     </Box>
     
