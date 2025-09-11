@@ -1,12 +1,12 @@
-import { useParams } from "react-router";
 import { useState } from "react";
-import filmsList from "../components/filmsList"
+import { useNavigate } from "react-router";
 import genresList from "../components/genresList";
 import { Button, FileUpload, Field, Flex, Heading, Input, Checkbox, Text, Textarea } from "@chakra-ui/react";
 import { HiUpload } from "react-icons/hi"
 
 export default function AddFilmPage() {
 
+    const navigate = useNavigate();
     const [genres, setGenres] = useState(genresList);
 
 
@@ -65,7 +65,7 @@ export default function AddFilmPage() {
                     </Flex>
                 </FileUpload.Root>
                 <Flex justify={"center"}>
-                    <Button variant={"solid"} colorPalette="blue" w={"145px"} h={"48px"}>Сохранить</Button>
+                    <Button variant={"solid"} colorPalette="blue" w={"145px"} h={"48px"} onClick={() => navigate("/")}>Сохранить</Button>
                 </Flex>
            </Flex>           
         </Flex>
