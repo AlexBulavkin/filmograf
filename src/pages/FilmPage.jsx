@@ -1,6 +1,6 @@
-import { Box, Button, Flex, Heading, Icon, Image, Text, Textarea } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Icon, Image, Text} from "@chakra-ui/react";
 import { FaRegStar, FaStar } from "react-icons/fa";
-import { useParams } from "react-router";
+import { useParams, Link } from "react-router";
 import { useState } from "react";
 import filmsList from "../components/filmsList";
 import { useFavorites } from "../components/useFavorites";
@@ -36,7 +36,7 @@ export default function FilmPage() {
       </Image>
       <Flex direction="column">
         <Flex justify={"space-between"} align={"center"} w="625px" mb="20px">
-          <Heading fontSize="40px" fontWeight="bold" > {film.title} </Heading>
+          <Heading fontSize="40px" fontWeight="bold"> {film.title} </Heading>
           <Icon 
               color={"#F9A62B"} 
               cursor="pointer"
@@ -53,10 +53,10 @@ export default function FilmPage() {
           </Icon>
           <Text  fontSize="14px" fontWeight={"regular"}> {film.duration} мин. </Text>
         </Flex>
-        <Text fontSize={"16px"} > Фильм очень интересный </Text>  
+        <Text fontSize={"16px"} > {film.description} </Text>  
         <Flex gap={"10px"} justify={"end"}>
-          <Button colorPalette="blue" borderBottomWidth="1px" borderColor={"#DEE2E6"}> Редактировать </Button>
-          <Button colorPalette="blue" borderBottomWidth="1px" borderColor={"#DEE2E6"}> Удалить </Button>
+          <Button variant={"outline"} as={Link} to={`/edit_film/${film.id}`} colorPalette="blue" borderBottomWidth="1px" borderColor={"#DEE2E6"}> Редактировать </Button>
+          <Button variant={"outline"} colorPalette="blue" borderBottomWidth="1px" borderColor={"#DEE2E6"}> Удалить </Button>
         </Flex>   
       </Flex>
 

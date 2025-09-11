@@ -46,6 +46,7 @@ export default function SavedPage() {
             <Button 
               color="gray.400"
               onClick={() => removeFromFavorites(film.id)}
+              _hover={{color: "black"}}
             >
               Удалить
             </Button>

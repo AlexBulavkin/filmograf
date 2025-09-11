@@ -29,9 +29,9 @@ export function Filters({ selectedGenres, onGenreChange }) {
                             onCheckedChange={() => handleCheckboxChange(filter.title)}
                         >
                             <Checkbox.HiddenInput />
-                            <Checkbox.Control rounded={"full"} >
-                                <Checkbox.Indicator />
-                            </Checkbox.Control>
+                            <Checkbox.Control rounded={"full"} borderColor={`${filter.color}.400`}>
+                                <Checkbox.Indicator color={"white"}></Checkbox.Indicator>
+                            </Checkbox.Control >
                             <Checkbox.Label fontSize={"16px"} fontWeight={"medium"}> 
                                 {filter.title} 
                             </Checkbox.Label>
