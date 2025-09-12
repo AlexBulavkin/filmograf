@@ -1,64 +1,50 @@
-import { Box, Checkbox, Grid, Flex, Heading, Icon, Image, Text } from "@chakra-ui/react";
-import { Link } from "react-router";
-import { FaRegStar, FaStar } from "react-icons/fa";
-import { GoClock } from "react-icons/go";
 import { useState } from "react";
+import { Link } from "react-router";
+import { GoClock } from "react-icons/go";
+import { FaRegStar, FaStar } from "react-icons/fa";
+import { Box, Checkbox, Grid, Flex, Heading, Icon, Image, Text } from "@chakra-ui/react";
+import { useFavorites } from "./useFavorites";
 import filmsList from "./filmsList"
 import genresList from "./genresList";
-import { useFavorites } from "./useFavorites";
 
-export function Filters({ selectedGenres, onGenreChange }) {
-    const [filters, setFilters] = useState(genresList);
+
+export default function Films (){
+    
+    const [films, setFilms] = useState(filmsList);
+
+    const addFilms = (genreTitle) => {
+        const newFilms = filmsList.filter((film) => film.genre == genreTitle);
+        setFilms((prevFilms) => [...prevFilms, ...newFilms]);
+    };
+    
+    const removeFilms = (genreTitle) => {
+        setFilms(films.filter((film) => film.genre !== genreTitle));
+    };
+
+    const genres = genresList
+    const genreToColorMap = new Map(genres.map(genre=> [genre.title, genre.color]));
+    const genresTitles = genres.map(genre => genre.title);
+    const [selectedGenres, setSelectedGenres] = useState(genresTitles);
+
+    const addGenre = (genreTitle) => {
+        setSelectedGenres([...selectedGenres, genreTitle]);
+    };
+
+    const removeGenre = (genreTitle) => {
+        setSelectedGenres(selectedGenres.filter((genre) => genre !== genreTitle));
+    };
     
     const handleCheckboxChange = (genreTitle) => {
         if (selectedGenres.includes(genreTitle)) {
-            onGenreChange(selectedGenres.filter(genre => genre !== genreTitle));
+            removeGenre(genreTitle);
+            removeFilms(genreTitle)
         } else {
-            onGenreChange([...selectedGenres, genreTitle]);
+            addGenre(genreTitle);
+            addFilms(genreTitle)
         }
     };
 
-    return (
-        <Flex gap={'10px'} wrap="wrap">
-            {filters.map((filter) => (
-                <Flex key={filter.id} align={"center"} gap={'10px'}>
-                    <Flex gap={'5px'}>
-                        <Checkbox.Root 
-                            colorPalette={`${filter.color}`}
-                            checked={selectedGenres.includes(filter.title)}
-                            onCheckedChange={() => handleCheckboxChange(filter.title)}
-                        >
-                            <Checkbox.HiddenInput />
-                            <Checkbox.Control rounded={"full"} borderColor={`${filter.color}.400`}>
-                                <Checkbox.Indicator color={"white"}></Checkbox.Indicator>
-                            </Checkbox.Control >
-                            <Checkbox.Label fontSize={"16px"} fontWeight={"medium"}> 
-                                {filter.title} 
-                            </Checkbox.Label>
-                        </Checkbox.Root>
-                    </Flex>
-                </Flex>
-            ))}
-        </Flex>
-    )
-};
-
-export default function Films() {
-    const [films, setFilms] = useState(filmsList);
-    const [genres, setGenres] = useState(genresList);
-    
-    const allGenres = genres.map(genre => genre.title);
-    const [selectedGenres, setSelectedGenres] = useState(allGenres);
-    
-    const genreMap = new Map(genres.map(g => [g.title, g.color]));
-    
     const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-
-    const filteredFilms = selectedGenres.length === allGenres.length
-        ? films
-        : selectedGenres.length > 0
-            ? films.filter(film => selectedGenres.includes(film.genre))
-            : [];
 
     const handleFavoriteClick = (film) => {
         if (isFavorite(film.id)) {
@@ -72,13 +58,30 @@ export default function Films() {
         <>
         <Flex justify={"space-between"} my="30px"  mr="30px">
             <Heading fontSize="40px" fontWeight="bold">Фильмы</Heading>
-            <Filters 
-                selectedGenres={selectedGenres} 
-                onGenreChange={setSelectedGenres} 
-            />
+            <Flex gap={'10px'} wrap="wrap">
+                {genres.map((filter) => (
+                    <Flex key={filter.id} align={"center"} gap={'10px'}>
+                        <Flex gap={'5px'}>
+                            <Checkbox.Root
+                                colorPalette={`${filter.color}`}
+                                checked={selectedGenres.includes(filter.title)}
+                                onCheckedChange={() => handleCheckboxChange(filter.title)}
+                            >
+                                <Checkbox.HiddenInput />
+                                <Checkbox.Control rounded={"full"} borderColor={`${filter.color}.400`}>
+                                    <Checkbox.Indicator color={"white"}></Checkbox.Indicator>
+                                </Checkbox.Control >
+                                <Checkbox.Label fontSize={"16px"} fontWeight={"medium"}> 
+                                    {filter.title} 
+                                </Checkbox.Label>
+                            </Checkbox.Root>
+                        </Flex>
+                    </Flex>
+                ))}
+            </Flex>
         </Flex>
         <Grid templateColumns="repeat(3, 1fr)" gap="61px">
-                {filteredFilms.map((film) => (
+                {films.map((film) => (
                     <Box key={film.id} borderWidth="1px" borderColor={"#DEE2E6"} rounded={"20px"} h={"350px"} w={"325px"}>
                         <Image
                         src={film.src}
@@ -92,8 +95,17 @@ export default function Films() {
                             <Link to={`/film/${film.id}`} >{film.title} </Link>
                         </Text>  
                         <Flex justify={'space-between'} align={"center"} my={'20px'} mx={'20px'}>
-                            <Box bg={`${genreMap.get(film.genre) || "black"}.100`} rounded={"20px"}>
-                                <Text p={"5px"} color={genreMap.get(film.genre) || "black"} fontSize="14px" fontWeight={"medium"}>{film.genre}</Text>
+                            <Box
+                            bg={`${genreToColorMap.get(film.genre) || "black"}.100`}
+                            rounded={"20px"}>
+                                <Text
+                                p={"5px"} 
+                                color={genreToColorMap.get(film.genre) || "black"}
+                                fontSize="14px" 
+                                fontWeight={"medium"}
+                                > 
+                                {film.genre}
+                                </Text>
                             </Box>
                             <Flex gap="5px">
                                 <Icon>
