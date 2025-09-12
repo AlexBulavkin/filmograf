@@ -1,7 +1,6 @@
 import { Box, Button, Flex, Heading, Icon, Image, Text} from "@chakra-ui/react";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { useParams, Link } from "react-router";
-import { useState } from "react";
 import filmsList from "../components/filmsList";
 import { useFavorites } from "../components/useFavorites";
 import genresList from "../components/genresList";
@@ -21,8 +20,7 @@ export default function FilmPage() {
 
   const film = filmsList[param.id - 1]
 
-  const [genres, setGenres] = useState(genresList);
-  const genreMap = new Map(genres.map(g => [g.title, g.color]));
+  const genreMap = new Map(genresList.map(g => [g.title, g.color]));
 
   
   return (

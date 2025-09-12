@@ -8,7 +8,6 @@ import { HiUpload } from "react-icons/hi"
 export default function EditFilmPage() {
     const param = useParams();
     const film = filmsList[param.id - 1];
-    const [genres, setGenres] = useState(genresList);
     const [selectedGenre, setSelectedGenre] = useState(film.genre || "");
 
     const handleGenreChange = (genreTitle) => {
@@ -26,7 +25,7 @@ export default function EditFilmPage() {
                 <Flex>
                     <Text w="220px" userSelect="none">Жанр</Text>
                     <Flex gap={'10px'} wrap="wrap">
-                        {genres.map((genre) => (
+                        {genresList.map((genre) => (
                             <Flex key={genre.id} align={"center"} gap={'10px'}>
                                 <Flex gap={'5px'}>
                                     <Checkbox.Root 

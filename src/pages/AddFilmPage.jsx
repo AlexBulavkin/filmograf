@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router";
 import genresList from "../components/genresList";
 import { Button, FileUpload, Field, Flex, Heading, Input, Checkbox, Text, Textarea } from "@chakra-ui/react";
@@ -7,8 +6,6 @@ import { HiUpload } from "react-icons/hi"
 export default function AddFilmPage() {
 
     const navigate = useNavigate();
-    const [genres, setGenres] = useState(genresList);
-
 
     return (
         <Flex direction={"column"} w={"986px"}>
@@ -21,7 +18,7 @@ export default function AddFilmPage() {
                 <Flex>
                     <Text w="220px" userSelect="none">Жанр</Text>
                     <Flex gap={'10px'} wrap="wrap">
-                        {genres.map((genre) => (
+                        {genresList.map((genre) => (
                             <Flex key={genre.id} align={"center"} gap={'10px'}>
                                 <Flex gap={'5px'}>
                                     <Checkbox.Root 
