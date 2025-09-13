@@ -1,22 +1,25 @@
-import { useForm } from "react-hook-form";
+import { useController, useForm } from "react-hook-form";
 import { useParams } from "react-router";
-import { useState } from "react";
 import { useNavigate } from "react-router";
 import genresList from "../components/genresList";
 import filmsList from "../components/filmsList"
-import { Button, FileUpload, Field, Flex, Heading, Input, Checkbox, Text, Textarea, Fieldset, FieldErrorText, } from "@chakra-ui/react";
+import { Code, Button, FileUpload, Field, Flex, Heading, Input, Checkbox, Text, Textarea, Fieldset, FieldErrorText, CheckboxGroup, } from "@chakra-ui/react";
 
 export default function EditFilmPage() {
     const param = useParams();
     const film = filmsList[param.id - 1];
-    const [selectedGenre, setSelectedGenre] = useState(film.genre || "");
-
-    const handleGenreChange = (genreTitle) => {
-        setSelectedGenre(genreTitle);
-    };
 
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors}} = useForm();
+    const { control, register, handleSubmit, formState: { errors}} = useForm();
+
+    const genres = useController({
+        control,
+        name: "genres",
+        defaultValue: [film.genre],
+        rules: {
+            required: "Необходимо указать жанр"
+        }
+    })
 
     const onSubmit = (data) => {
         console.log(data);
@@ -47,20 +50,21 @@ export default function EditFilmPage() {
                     <Fieldset.Root invalid={!!errors.genres}>
                         <Flex>
                             <Fieldset.Legend userSelect="none" color={"black"} minW="220px" fontSize={"16px"}>Жанр</Fieldset.Legend>
+                            <CheckboxGroup
+                                invalid={!!errors.genres}
+                                value={genres.field.value}
+                                onValueChange={genres.field.onChange}
+                                name={genres.field.name}
+                            >
+                            <Fieldset.Content>                           
                             <Flex gap="10px">
                                 {genresList.map((genre) => (
                                     <Checkbox.Root 
                                         key={genre.id}
                                         colorPalette={genre.color}
-                                        // checked={selectedGenre === genre.title}
-                                        // onCheckedChange={() => handleGenreChange(genre.title)}
+                                        value={genre.title}
                                     >
-                                        <Checkbox.HiddenInput 
-                                            {...register("genres", {
-                                                required: "Выберите хотя бы один жанр"
-                                            })}
-                                            value={genre.title}
-                                        />
+                                        <Checkbox.HiddenInput/>
                                         <Checkbox.Control
                                             borderColor={`${genre.color}.400`} 
                                             rounded={"full"} 
@@ -73,10 +77,13 @@ export default function EditFilmPage() {
                                     </Checkbox.Root>
                                 ))}
                             </Flex>
+                            </Fieldset.Content>
+                            </CheckboxGroup>  
                         </Flex>
                         {errors.genres && (
                             <Fieldset.ErrorText>{errors.genres.message}</Fieldset.ErrorText>
                         )}
+                        <Code>Values: {JSON.stringify(genres.field.value, null, 2)}</Code>
                     </Fieldset.Root>
                     <Field.Root orientation="horizontal" invalid={!!errors.duration}>
                         <Flex gap={"10px"} align={"center"}>
