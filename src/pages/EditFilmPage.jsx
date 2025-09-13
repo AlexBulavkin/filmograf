@@ -1,9 +1,10 @@
+import { useForm } from "react-hook-form";
 import { useParams } from "react-router";
 import { useState } from "react";
-import filmsList from "../components/filmsList"
+import { useNavigate } from "react-router";
 import genresList from "../components/genresList";
-import { Button, FileUpload, Field, Flex, Heading, Input, Checkbox, Text, Textarea } from "@chakra-ui/react";
-import { HiUpload } from "react-icons/hi"
+import filmsList from "../components/filmsList"
+import { Button, FileUpload, Field, Flex, Heading, Input, Checkbox, Text, Textarea, Fieldset, FieldErrorText, } from "@chakra-ui/react";
 
 export default function EditFilmPage() {
     const param = useParams();
@@ -14,26 +15,52 @@ export default function EditFilmPage() {
         setSelectedGenre(genreTitle);
     };
 
+    const navigate = useNavigate();
+    const { register, handleSubmit, formState: { errors}} = useForm();
+
+    const onSubmit = (data) => {
+        console.log(data);
+        console.log(data.title, data.genres, data.duration, data.description, data.image)
+        navigate("/")
+    };
+
     return (
-        <Flex direction={"column"} w={"986px"}>
-           <Heading fontSize="40px" fontWeight="bold" mb={"61px"}> Редактировать фильм </Heading>
-           <Flex direction={"column"} ml="201px" w={"785px"}  borderWidth={"1px"} borderColor={"#DEE2E6"} pl={"60px"} pt={"60px"} pb={"60px"} pr={"116px"} rounded={"20px"} gap={"20px"}>
-                <Field.Root orientation="horizontal">
-                    <Field.Label minW="230px" fontSize={"16px"}> Название фильма </Field.Label>
-                    <Input borderColor="gray.300" defaultValue={film.title}></Input>
-                </Field.Root>
-                <Flex>
-                    <Text w="220px" userSelect="none">Жанр</Text>
-                    <Flex gap={'10px'} wrap="wrap">
-                        {genresList.map((genre) => (
-                            <Flex key={genre.id} align={"center"} gap={'10px'}>
-                                <Flex gap={'5px'}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+            <Flex direction={"column"} w={"986px"}>
+            <Heading fontSize="40px" fontWeight="bold" mb={"61px"}> Редактировать фильм </Heading>
+            <Flex direction={"column"} ml="201px" w={"785px"}  borderWidth={"1px"} borderColor={"#DEE2E6"} pl={"60px"} pt={"60px"} pb={"60px"} pr={"116px"} rounded={"20px"} gap={"20px"}>
+                    <Field.Root orientation="horizontal" invalid={!!errors.title}>
+                        <Field.Label minW="220px" fontSize={"16px"}> Название фильма </Field.Label>
+                        <Input
+                            defaultValue={film.title}
+                            borderColor="gray.300"
+                            {...register("title", (
+                                { required: "Название обязательно",
+                                  minLength: { value: 3 , message: "Минимум 3 символа" },
+                                  maxLength: { value: 200 , message: "Максимум 200 символов" } })
+                                )
+                            } ></Input>
+                        {errors.title && (
+                            <FieldErrorText>{ errors.title.message}</FieldErrorText>
+                        )}
+                    </Field.Root>
+                    <Fieldset.Root invalid={!!errors.genres}>
+                        <Flex>
+                            <Fieldset.Legend userSelect="none" color={"black"} minW="220px" fontSize={"16px"}>Жанр</Fieldset.Legend>
+                            <Flex gap="10px">
+                                {genresList.map((genre) => (
                                     <Checkbox.Root 
-                                        colorPalette={`${genre.color}`}
-                                        checked={selectedGenre === genre.title}
-                                        onCheckedChange={() => handleGenreChange(genre.title)}
+                                        key={genre.id}
+                                        colorPalette={genre.color}
+                                        // checked={selectedGenre === genre.title}
+                                        // onCheckedChange={() => handleGenreChange(genre.title)}
                                     >
-                                        <Checkbox.HiddenInput />
+                                        <Checkbox.HiddenInput 
+                                            {...register("genres", {
+                                                required: "Выберите хотя бы один жанр"
+                                            })}
+                                            value={genre.title}
+                                        />
                                         <Checkbox.Control
                                             borderColor={`${genre.color}.400`} 
                                             rounded={"full"} 
@@ -44,36 +71,56 @@ export default function EditFilmPage() {
                                             {genre.title} 
                                         </Checkbox.Label>
                                     </Checkbox.Root>
-                                </Flex>
+                                ))}
                             </Flex>
-                        ))}
+                        </Flex>
+                        {errors.genres && (
+                            <Fieldset.ErrorText>{errors.genres.message}</Fieldset.ErrorText>
+                        )}
+                    </Fieldset.Root>
+                    <Field.Root orientation="horizontal" invalid={!!errors.duration}>
+                        <Flex gap={"10px"} align={"center"}>
+                            <Field.Label minW="220px" fontSize={"16px"}> Длительность </Field.Label>
+                            <Input defaultValue={film.duration} type="number" borderColor="gray.300" w="84px" {...register("duration", {required: "Длительность обязательна"})}></Input>
+                            <Text  userSelect="none" >мин</Text>
+                        </Flex>
+                        {errors.duration && (
+                            <FieldErrorText>{ errors.duration.message}</FieldErrorText>
+                        )}
+                    </Field.Root>
+                    <Field.Root orientation="horizontal" invalid={!!errors.description}>
+                        <Field.Label minW="220px" fontSize={"16px"}> Описание </Field.Label>
+                        <Textarea
+                            defaultValue={film.description}
+                            borderColor="gray.300" 
+                            {...register("description", {
+                                required: "Описание обязательно",
+                                minLength: { value: 10 , message: "Минимум 10 символов" },
+                                maxLength: { value: 1000 , message: "Максимум 1000 символов" }
+                            })}
+                            >
+                        </Textarea>
+                        {errors.description && (
+                            <FieldErrorText>{ errors.description.message}</FieldErrorText>
+                        )}
+                    </Field.Root>
+                    <FileUpload.Root>
+                        <FileUpload.HiddenInput/>
+                        <Flex>
+                            <FileUpload.Label w={"220px"} fontSize={"16px"}>Загрузить фото</FileUpload.Label>
+                            <FileUpload.Trigger asChild>
+                                <Button variant={"subtle"} color={"black"} bg={"gray.200"} size="sm">
+                                 Выбрать файл
+                                </Button>
+                            </FileUpload.Trigger>
+                            <FileUpload.List />
+                        </Flex>
+                    </FileUpload.Root>
+                    <Flex justify={"center"}>
+                        <Button type="submit" variant={"solid"} colorPalette="blue" w={"145px"} h={"48px"}>Сохранить</Button>
                     </Flex>
-                </Flex>
-                <Flex gap={"10px"} align={"center"}>
-                    <Text  userSelect="none" w={"230px"}>Длительность</Text>
-                    <Input type="number" borderColor="gray.300" defaultValue={film.duration} w="84px"></Input>
-                    <Text  userSelect="none" >мин</Text>
-                </Flex>
-                <Field.Root orientation="horizontal">
-                    <Field.Label minW="230px" fontSize={"16px"}> Описание </Field.Label>
-                    <Textarea borderColor="gray.300" defaultValue={film.description}></Textarea>
-                </Field.Root>
-                <FileUpload.Root>
-                    <FileUpload.HiddenInput />
-                    <Flex>
-                        <Text  userSelect="none" w={"230px"}>Загрузить фото</Text>
-                        <FileUpload.Trigger asChild>
-                            <Button variant="solid" size="sm">
-                            <HiUpload /> Выбрать файл
-                            </Button>
-                        </FileUpload.Trigger>
-                        <FileUpload.List />
-                    </Flex>
-                </FileUpload.Root>
-                <Flex justify={"center"}>
-                    <Button variant={"solid"} colorPalette="blue" w={"145px"} h={"48px"}>Сохранить</Button>
-                </Flex>
-           </Flex>           
-        </Flex>
+            </Flex>           
+            </Flex>
+        </form>
     );
 }
