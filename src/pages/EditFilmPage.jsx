@@ -1,24 +1,29 @@
+import { useState } from "react";
 import { useController, useForm } from "react-hook-form";
 import { useParams } from "react-router";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 import genresList from "../components/genresList";
 import filmsList from "../components/filmsList"
 import { Box, Button, FileUpload, Field, Flex, Grid, Heading, Input, Checkbox, Text, Textarea, Fieldset, FieldErrorText, CheckboxGroup, } from "@chakra-ui/react";
 
 export default function EditFilmPage() {
     const param = useParams();
-    const film = filmsList[param.id - 1];
 
-    const navigate = useNavigate();
-    const { control, register, handleSubmit, formState: { errors}} = useForm({
-        defaultValues: {
-            title: film.title,
-            genres: [film.genre],
-            duration: film.duration,
-            description: film.description,
-            image: film.src
-        }
+    const [film, setFilm] = useState({
+        id: filmsList[param.id - 1].id,
+        title: filmsList[param.id - 1].title,
+        genre: filmsList[param.id - 1].genre,
+        duration: filmsList[param.id - 1].duration,
+        description: filmsList[param.id - 1].description,
+        image: filmsList[param.id - 1].src
     });
+
+    const updateFilm = (data) => {
+        setFilm({ ...film, title: data.title, genre: data.genres[0], duration: data.duration, description: data.description, image: data.image });
+    };
+
+    // const navigate = useNavigate();
+    const { control, reset, register, setValue, handleSubmit, formState: { errors, isDirty, isValid}} = useForm({mode: "onChange"});
 
     const genres = useController({
         control,
@@ -36,15 +41,18 @@ export default function EditFilmPage() {
         }
     });
 
-
     const onSubmit = (data) => {
-        console.log(data);
-        console.log(data.title, data.genres, data.duration, data.description, data.image)
-        navigate("/")
+        // console.log(data);
+        // console.log(data.title, data.genres, data.duration, data.description, data.image)
+        updateFilm(data)
+        // reset()
     };
+
+    const isFormValid = isValid && isDirty;
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
+            {console.log(film, "Проверка Стейта")}
             <Flex direction={"column"} w={"986px"}>
             <Heading fontSize="40px" fontWeight="bold" mb={"61px"}> Редактировать фильм </Heading>
             <Flex direction={"column"} ml="201px" w={"785px"}  borderWidth={"1px"} borderColor={"#DEE2E6"} pl={"60px"} pt={"60px"} pb={"60px"} pr={"116px"} rounded={"20px"} gap={"20px"}>
@@ -158,8 +166,38 @@ export default function EditFilmPage() {
                         <FieldErrorText>{errors.image.message}</FieldErrorText>
                     )}
                     </Field.Root>
+                    {isFormValid ? (
+                        <Flex justify={"center"}>
+                            <Button type="submit" variant={"solid"} colorPalette="blue" w={"145px"} h={"48px"}>
+                                Сохранить
+                            </Button>
+                        </Flex>
+                    ) : (
+                        <Flex justify={"center"}>
+                            <Button 
+                                type="submit" 
+                                variant={"solid"} 
+                                color={"white"}
+                                bg={"blue.400"}
+                                w={"145px"} 
+                                h={"48px"}
+                                disabled={true}
+                            >
+                                Сохранить
+                            </Button>
+                        </Flex>
+                    )}
                     <Flex justify={"center"}>
-                        <Button type="submit" variant={"solid"} colorPalette="blue" w={"145px"} h={"48px"}>Сохранить</Button>
+                        <Button variant={"solid"} colorPalette="blue" w={"145px"} h={"48px"}
+                                onClick={() => (
+                                    setValue("title", film.title),
+                                    setValue("genres", [film.genre]),
+                                    setValue("duration", film.duration),
+                                    setValue("description", film.description),
+                                    setValue("image", film.src)
+    )}>
+                            Редактировать
+                        </Button>
                     </Flex>
             </Flex>           
             </Flex>
