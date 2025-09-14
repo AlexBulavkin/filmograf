@@ -6,7 +6,15 @@ import { Button, FileUpload, Field, Flex, Grid, Heading, Input, Checkbox, Checkb
 export default function AddFilmPage() {
 
     const navigate = useNavigate();
-    const { control, register, handleSubmit, formState: { errors }} = useForm();
+    const { control, register, handleSubmit, formState: { errors}} = useForm({
+        defaultValues: {
+            title: "Название фильма",
+            genres: ["Боевик"],
+            duration: "0",
+            description: "Интересный фильм",
+            image: ""
+        }
+    });
 
     const genres = useController({
         control,

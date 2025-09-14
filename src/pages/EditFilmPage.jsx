@@ -10,12 +10,19 @@ export default function EditFilmPage() {
     const film = filmsList[param.id - 1];
 
     const navigate = useNavigate();
-    const { control, register, handleSubmit, formState: { errors}} = useForm();
+    const { control, register, handleSubmit, formState: { errors}} = useForm({
+        defaultValues: {
+            title: film.title,
+            genres: [film.genre],
+            duration: film.duration,
+            description: film.description,
+            image: film.src
+        }
+    });
 
     const genres = useController({
         control,
         name: "genres",
-        defaultValue: [film.genre],
         rules: {
             required: "Необходимо указать жанр"
         }
@@ -44,7 +51,6 @@ export default function EditFilmPage() {
                     <Field.Root orientation="horizontal" invalid={!!errors.title}>
                         <Field.Label minW="220px" fontSize={"16px"}> Название фильма </Field.Label>
                         <Input
-                            defaultValue={film.title}
                             borderColor="gray.300"
                             {...register("title", (
                                 { required: "Название обязательно",
@@ -56,6 +62,7 @@ export default function EditFilmPage() {
                             <FieldErrorText>{ errors.title.message}</FieldErrorText>
                         )}
                     </Field.Root>
+
                     <Fieldset.Root invalid={!!errors.genres}>
                         <Flex>
                             <Fieldset.Legend userSelect="none" color={"black"} minW="220px" fontSize={"16px"}>Жанр</Fieldset.Legend>
@@ -93,20 +100,21 @@ export default function EditFilmPage() {
                             <Fieldset.ErrorText>{errors.genres.message}</Fieldset.ErrorText>
                         )}
                     </Fieldset.Root>
+
                     <Field.Root orientation="horizontal" invalid={!!errors.duration}>
                         <Flex gap={"10px"} align={"center"}>
                             <Field.Label minW="220px" fontSize={"16px"}> Длительность </Field.Label>
-                            <Input defaultValue={film.duration} type="number" borderColor="gray.300" w="84px" {...register("duration", {required: "Длительность обязательна"})}></Input>
+                            <Input type="number" borderColor="gray.300" w="84px" {...register("duration", {required: "Длительность обязательна"})}></Input>
                             <Text  userSelect="none" >мин</Text>
                         </Flex>
                         {errors.duration && (
                             <FieldErrorText>{ errors.duration.message}</FieldErrorText>
                         )}
                     </Field.Root>
+
                     <Field.Root orientation="horizontal" invalid={!!errors.description}>
                         <Field.Label minW="220px" fontSize={"16px"}> Описание </Field.Label>
                         <Textarea
-                            defaultValue={film.description}
                             borderColor="gray.300" 
                             {...register("description", {
                                 required: "Описание обязательно",
@@ -119,6 +127,7 @@ export default function EditFilmPage() {
                             <FieldErrorText>{ errors.description.message}</FieldErrorText>
                         )}
                     </Field.Root>
+
                     <Field.Root orientation="horizontal" invalid={!!errors.image}>
                     <FileUpload.Root {...imageField}>
                         <FileUpload.HiddenInput/>
