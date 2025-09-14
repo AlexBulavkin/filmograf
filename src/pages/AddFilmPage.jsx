@@ -1,12 +1,12 @@
 import { useController, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import genresList from "../components/genresList";
-import { Code, Button, FileUpload, Field, Flex, Heading, Input, Checkbox, CheckboxGroup, Text, Textarea, Fieldset, FieldErrorText, } from "@chakra-ui/react";
+import { Button, FileUpload, Field, Flex, Grid, Heading, Input, Checkbox, CheckboxGroup, Text, Textarea, Fieldset, FieldErrorText, Box} from "@chakra-ui/react";
 
 export default function AddFilmPage() {
 
     const navigate = useNavigate();
-    const { control, register, handleSubmit, formState: { errors}} = useForm();
+    const { control, register, handleSubmit, formState: { errors }} = useForm();
 
     const genres = useController({
         control,
@@ -16,6 +16,15 @@ export default function AddFilmPage() {
             required: "Необходимо указать жанр"
         }
     })
+
+    const {field: imageField} = useController({
+        name: "image",
+        control,
+        rules: {
+            required: "Изображение необходимо",
+        }
+    });
+
 
     const onSubmit = (data) => {
         console.log(data);
@@ -80,7 +89,6 @@ export default function AddFilmPage() {
                         {errors.genres && (
                             <Fieldset.ErrorText>{errors.genres.message}</Fieldset.ErrorText>
                         )}
-                        <Code>Values: {JSON.stringify(genres.field.value, null, 2)}</Code>
                     </Fieldset.Root>
                     <Field.Root orientation="horizontal" invalid={!!errors.duration}>
                         <Flex gap={"10px"} align={"center"}>
@@ -107,18 +115,36 @@ export default function AddFilmPage() {
                             <FieldErrorText>{ errors.description.message}</FieldErrorText>
                         )}
                     </Field.Root>
-                    <FileUpload.Root>
+                    <Field.Root orientation="horizontal" invalid={!!errors.image}>
+                    <FileUpload.Root {...imageField}>
                         <FileUpload.HiddenInput/>
-                        <Flex>
-                            <FileUpload.Label w={"220px"} fontSize={"16px"}>Загрузить фото</FileUpload.Label>
+                        <Grid templateColumns="repeat(3, 1fr)">
+                            <FileUpload.Label w={"225px"} fontSize={"16px"}>Загрузить фото</FileUpload.Label>     
                             <FileUpload.Trigger asChild>
-                                <Button variant={"subtle"} color={"black"} bg={"gray.200"} size="sm">
+                                <Button variant={"subtle"} color={"black"} bg={"gray.200"} w={"173"} h={"48px"} fontSize={"18px"}>
                                  Выбрать файл
                                 </Button>
                             </FileUpload.Trigger>
-                            <FileUpload.List />
-                        </Flex>
+                            <Box ml={"20px"} >
+                            <FileUpload.ItemGroup>
+                            <FileUpload.Context>
+                                {({ acceptedFiles }) =>
+                                acceptedFiles.map((file) => (
+                                    <FileUpload.Item key={file.name} file={file} bg={"white"} borderWidth={"1px"} borderColor={"#DEE2E6"} h={"48px"} >
+                                        <FileUpload.ItemPreview  />
+                                        <FileUpload.ItemName color={"black"} fontSize={"18px"}/>
+                                    </FileUpload.Item>
+                                ))
+                                }
+                            </FileUpload.Context>
+                            </FileUpload.ItemGroup>
+                            </Box>
+                        </Grid>
                     </FileUpload.Root>
+                    {errors.image && (
+                        <FieldErrorText>{errors.image.message}</FieldErrorText>
+                    )}
+                    </Field.Root>
                     <Flex justify={"center"}>
                         <Button type="submit" variant={"solid"} colorPalette="blue" w={"145px"} h={"48px"}>Добавить фильм</Button>
                     </Flex>
