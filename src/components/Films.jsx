@@ -1,25 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { Link } from "react-router";
 import { GoClock } from "react-icons/go";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { Box, Checkbox, Grid, Flex, Heading, Icon, Image, Text } from "@chakra-ui/react";
 import { useFavorites } from "./useFavorites";
-import filmsList from "./filmsList"
 import genresList from "./genresList";
 
 
 export default function Films (){
     
-    const [films, setFilms] = useState(filmsList);
+    const [films, setFilms] = useState([]);
+    const [allFilms, setAllFilms] = useState([]);
 
     const addFilms = (genreTitle) => {
-        const newFilms = filmsList.filter((film) => film.genre == genreTitle);
+        const newFilms = allFilms.filter((film) => film.genre == genreTitle);
         setFilms((prevFilms) => [...prevFilms, ...newFilms]);
     };
     
     const removeFilms = (genreTitle) => {
         setFilms(films.filter((film) => film.genre !== genreTitle));
     };
+
+    useEffect(() => {
+        async function fetchFilms() {
+            try {
+                const res = await axios.get("http://localhost:8000/movies"
+                );
+                console.log(res.data)
+                setFilms(res.data);
+                setAllFilms(res.data);
+            } catch (err) {
+                console.log("Ошибка загрузки данных");
+                setError("Ошибка загрузки данных");
+            }
+        }
+        fetchFilms();
+    }, []);
+    console.log(films)
+    
 
     const genres = genresList
     const genreToColorMap = new Map(genres.map(genre=> [genre.title, genre.color]));
@@ -84,7 +103,7 @@ export default function Films (){
                 {films.map((film) => (
                     <Box key={film.id} borderWidth="1px" borderColor={"#DEE2E6"} rounded={"20px"} h={"350px"} w={"325px"}>
                         <Image
-                        src={film.src}
+                        src={film.image_url}
                         fit={"cover"}
                         roundedTop={"20px"}
                         alt="Постер"

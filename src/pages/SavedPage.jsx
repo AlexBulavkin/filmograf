@@ -29,7 +29,7 @@ export default function SavedPage() {
         >
           <Flex align="center">
             <Image
-              src={film.src}
+              src={film.image_url}
               w="91px"
               h="91px"
               fit={"cover"}
