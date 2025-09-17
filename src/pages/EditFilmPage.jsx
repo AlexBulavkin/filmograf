@@ -28,17 +28,13 @@ export default function EditFilmPage() {
             try {
                 setLoading(true);
                 const res = await axios.get(`http://localhost:8000/movies/${id}`);
-                console.log("Film data:", res.data);
                 setFilm(res.data);
-                
-                // Заполняем форму данными фильма
                 setValue("title", res.data.title);
                 setValue("genres", [res.data.genre]);
                 setValue("duration", res.data.duration.toString());
                 setValue("description", res.data.description);
                 
             } catch (err) {
-                console.log("Ошибка загрузки данных", err);
                 setError("Ошибка загрузки данных");
             } finally {
                 setLoading(false);
@@ -65,18 +61,13 @@ export default function EditFilmPage() {
 
     const onSubmit = async (data) => {
         try {
-            // Подготовка данных для отправки
             const updateData = {
                 title: data.title,
                 genre: data.genres[0],
                 duration: parseInt(data.duration),
                 description: data.description
             };
-
-            // Отправка PATCH запроса
             await axios.patch(`http://localhost:8000/movies/${id}`, updateData);
-            
-            // Перенаправление после успешного обновления
             navigate("/");
         } catch (error) {
             console.error("Ошибка при обновлении фильма:", error);

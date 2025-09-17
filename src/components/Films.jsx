@@ -25,11 +25,9 @@ export default function Films (){
         async function fetchFilms() {
             try {
                 const res = await axios.get("http://localhost:8000/movies");
-                console.log("Films data:", res.data);
                 setFilms(res.data);
                 setAllFilms(res.data);
             } catch (err) {
-                console.log("Ошибка загрузки данных");
                 setError("Ошибка загрузки данных");
             }
         }
@@ -38,8 +36,6 @@ export default function Films (){
 
     async function updateIsFavorite(filmId, value) {
         try {
-            console.log("Updating film:", filmId, "to:", value);
-            
             const response = await axios.patch(
                 `http://localhost:8000/movies/${filmId}`,
                 {
@@ -51,8 +47,6 @@ export default function Films (){
                     }
                 }
             );
-            
-            console.log("Update successful:", response.data);
             
             // Обновляем состояние
             setFilms(prevFilms => 
@@ -105,7 +99,6 @@ export default function Films (){
     };
 
     const handleFavoriteClick = (film) => {
-        console.log("Current film:", film);
         updateIsFavorite(film.id, !film.is_favorite);
     };
 

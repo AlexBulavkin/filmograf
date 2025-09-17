@@ -10,10 +10,8 @@ export default function SavedPage() {
       async function fetchFilms() {
           try {
               const res = await axios.get("http://localhost:8000/movies/favorites");
-              console.log("Films data:", res.data);
               setFilms(res.data);
           } catch (err) {
-              console.log("Ошибка загрузки данных");
               setError("Ошибка загрузки данных");
           }
       }
@@ -22,9 +20,7 @@ export default function SavedPage() {
 
 
   const removeFromFavorites = async (filmId) => {
-    try {
-      console.log("Removing film from favorites:", filmId);
-      
+    try {      
       const response = await axios.patch(
         `http://localhost:8000/movies/${filmId}`,
         {
@@ -37,9 +33,6 @@ export default function SavedPage() {
         }
       );
       
-      console.log("Successfully removed from favorites:", response.data);
-      
-      // Обновляем список, удаляя фильм из текущего состояния
       setFilms(prevFilms => prevFilms.filter(film => film.id !== filmId));
       
     } catch (error) {
@@ -51,7 +44,6 @@ export default function SavedPage() {
       setError("Ошибка при удалении из избранного");
     }
   };
-
 
   if (films.length === 0) {
     return (

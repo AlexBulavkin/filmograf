@@ -9,7 +9,6 @@ import { GoClock } from "react-icons/go";
 export default function FilmPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  console.log("Film ID:", id);
   
   const [film, setFilm] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,10 +19,8 @@ export default function FilmPage() {
       try {
         setLoading(true);
         const res = await axios.get(`http://localhost:8000/movies/${id}`);
-        console.log("Film data:", res.data);
         setFilm(res.data);
       } catch (err) {
-        console.log("Ошибка загрузки данных", err);
         setError("Ошибка загрузки данных");
       } finally {
         setLoading(false);
@@ -40,16 +37,13 @@ export default function FilmPage() {
       await axios.delete(`http://localhost:8000/movies/${id}`);
       navigate("/");
     } catch (err) {
-      console.log("Ошибка удаления фильма", err);
       setError("Не удалось удалить фильм");
     }
   };
 
   
   async function updateIsFavorite(filmId, value) {
-      try {
-          console.log("Updating film:", filmId, "to:", value);
-          
+      try {          
           const response = await axios.patch(
               `http://localhost:8000/movies/${filmId}`,
               {
@@ -61,8 +55,6 @@ export default function FilmPage() {
                   }
               }
           );
-          
-          console.log("Update successful:", response.data);
           
           setFilm(prevFilm => 
                   prevFilm.id === filmId 
@@ -98,7 +90,6 @@ export default function FilmPage() {
   }
 
   const handleFavoriteClick = (film) => {
-      console.log("Current film:", film);
       updateIsFavorite(film.id, !film.is_favorite);
   };
 
