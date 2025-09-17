@@ -1,11 +1,59 @@
 import { Box, Button, Flex, Heading, Image, Text } from "@chakra-ui/react";
 import { GoClock } from "react-icons/go";
-import { useFavorites } from "../components/useFavorites";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function SavedPage() {
-  const { favorites, removeFromFavorites } = useFavorites();
+  const [films, setFilms] = useState([]);
 
-  if (favorites.length === 0) {
+  useEffect(() => {
+      async function fetchFilms() {
+          try {
+              const res = await axios.get("http://localhost:8000/movies/favorites");
+              console.log("Films data:", res.data);
+              setFilms(res.data);
+          } catch (err) {
+              console.log("Ошибка загрузки данных");
+              setError("Ошибка загрузки данных");
+          }
+      }
+      fetchFilms();
+  }, []);
+
+
+  const removeFromFavorites = async (filmId) => {
+    try {
+      console.log("Removing film from favorites:", filmId);
+      
+      const response = await axios.patch(
+        `http://localhost:8000/movies/${filmId}`,
+        {
+          is_favorite: false
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      console.log("Successfully removed from favorites:", response.data);
+      
+      // Обновляем список, удаляя фильм из текущего состояния
+      setFilms(prevFilms => prevFilms.filter(film => film.id !== filmId));
+      
+    } catch (error) {
+      console.error("Error removing from favorites:", error);
+      if (error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
+      setError("Ошибка при удалении из избранного");
+    }
+  };
+
+
+  if (films.length === 0) {
     return (
       <Box>
         <Heading fontSize="40px" fontWeight="bold" my={"30px"}>Избранное</Heading>
@@ -17,7 +65,7 @@ export default function SavedPage() {
   return (
     <Box>
       <Heading fontSize="40px" fontWeight="bold" my={"30px"}>Избранное</Heading>
-      {favorites.map((film) => (
+      {films.map((film) => (
         <Flex 
           key={film.id} 
           direction={"column"} 

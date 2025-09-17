@@ -4,14 +4,13 @@ import { Link } from "react-router";
 import { GoClock } from "react-icons/go";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { Box, Checkbox, Grid, Flex, Heading, Icon, Image, Text } from "@chakra-ui/react";
-import { useFavorites } from "./useFavorites";
 import genresList from "./genresList";
-
 
 export default function Films (){
     
     const [films, setFilms] = useState([]);
     const [allFilms, setAllFilms] = useState([]);
+    const [error, setError] = useState("");
 
     const addFilms = (genreTitle) => {
         const newFilms = allFilms.filter((film) => film.genre == genreTitle);
@@ -25,9 +24,8 @@ export default function Films (){
     useEffect(() => {
         async function fetchFilms() {
             try {
-                const res = await axios.get("http://localhost:8000/movies"
-                );
-                console.log(res.data)
+                const res = await axios.get("http://localhost:8000/movies");
+                console.log("Films data:", res.data);
                 setFilms(res.data);
                 setAllFilms(res.data);
             } catch (err) {
@@ -37,10 +35,53 @@ export default function Films (){
         }
         fetchFilms();
     }, []);
-    console.log(films)
-    
 
-    const genres = genresList
+    async function updateIsFavorite(filmId, value) {
+        try {
+            console.log("Updating film:", filmId, "to:", value);
+            
+            const response = await axios.patch(
+                `http://localhost:8000/movies/${filmId}`,
+                {
+                    is_favorite: value
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            
+            console.log("Update successful:", response.data);
+            
+            // Обновляем состояние
+            setFilms(prevFilms => 
+                prevFilms.map(film => 
+                    film.id === filmId 
+                        ? { ...film, is_favorite: value }
+                        : film
+                )
+            );
+            
+            setAllFilms(prevFilms => 
+                prevFilms.map(film => 
+                    film.id === filmId 
+                        ? { ...film, is_favorite: value }
+                        : film
+                )
+            );
+            
+        } catch (error) {
+            console.error("Error updating favorite:", error);
+            if (error.response) {
+                console.error("Response data:", error.response.data);
+                console.error("Response status:", error.response.status);
+            }
+            setError("Ошибка при обновлении избранного");
+        }
+    }
+
+    const genres = genresList;
     const genreToColorMap = new Map(genres.map(genre=> [genre.title, genre.color]));
     const genresTitles = genres.map(genre => genre.title);
     const [selectedGenres, setSelectedGenres] = useState(genresTitles);
@@ -56,21 +97,16 @@ export default function Films (){
     const handleCheckboxChange = (genreTitle) => {
         if (selectedGenres.includes(genreTitle)) {
             removeGenre(genreTitle);
-            removeFilms(genreTitle)
+            removeFilms(genreTitle);
         } else {
             addGenre(genreTitle);
-            addFilms(genreTitle)
+            addFilms(genreTitle);
         }
     };
 
-    const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-
     const handleFavoriteClick = (film) => {
-        if (isFavorite(film.id)) {
-            removeFromFavorites(film.id);
-        } else {
-            addToFavorites(film);
-        }
+        console.log("Current film:", film);
+        updateIsFavorite(film.id, !film.is_favorite);
     };
 
     return (
@@ -99,22 +135,28 @@ export default function Films (){
                 ))}
             </Flex>
         </Flex>
+        
+        {error && <Text color="red.500">{error}</Text>}
+        
         <Grid templateColumns="repeat(3, 1fr)" gap="61px">
-                {films.map((film) => (
-                    <Box key={film.id} borderWidth="1px" borderColor={"#DEE2E6"} rounded={"20px"} h={"350px"} w={"325px"}>
-                        <Image
+            {films.map((film) => (
+                <Box key={film.id} borderWidth="1px" borderColor={"#DEE2E6"} rounded={"20px"} h={"350px"} w={"325px"} overflow="hidden">
+                    <Image
                         src={film.image_url}
                         fit={"cover"}
                         roundedTop={"20px"}
-                        alt="Постер"
-                        />
-                        <Text 
+                        alt={`Постер фильма "${film.title}"`}
+                        h="150px"
+                        w="100%"
+                        objectFit="cover"
+                    />
+                    <Text 
                         color={"black"} fontSize="22px" fontWeight={"semibold"} 
                         my={'20px'} mx={'20px'}>
                             <Link to={`/film/${film.id}`} >{film.title} </Link>
-                        </Text>  
-                        <Flex justify={'space-between'} align={"center"} my={'20px'} mx={'20px'}>
-                            <Box
+                    </Text>  
+                    <Flex justify={'space-between'} align={"center"} my={'20px'} mx={'20px'}>
+                        <Box
                             bg={`${genreToColorMap.get(film.genre) || "black"}.100`}
                             rounded={"20px"}>
                                 <Text
@@ -125,23 +167,22 @@ export default function Films (){
                                 > 
                                 {film.genre}
                                 </Text>
-                            </Box>
-                            <Flex gap="5px">
-                                <Icon>
-                                    <GoClock />
-                                </Icon>
-                                <Text fontSize="14px" fontWeight={"regular"}> {film.duration} мин. </Text>                     
-                            </Flex>
-                            <Icon 
-                                color={"#F9A62B"} 
-                                cursor="pointer"
-                                onClick={() => handleFavoriteClick(film)}
-                                as={isFavorite(film.id) ? FaStar : FaRegStar}
-                            />
+                        </Box>
+                        <Flex gap="5px">
+                            <Icon>
+                                <GoClock />
+                            </Icon>
+                            <Text fontSize="14px" fontWeight={"regular"}> {film.duration} мин. </Text>                     
                         </Flex>
-                    </Box>
-                ))
-            }
+                        <Icon 
+                            color={"#F9A62B"} 
+                            cursor="pointer"
+                            onClick={() => handleFavoriteClick(film)}
+                            as={film.is_favorite ? FaStar : FaRegStar}
+                        />
+                    </Flex>
+                </Box>
+            ))}
         </Grid>
         </>
     )

@@ -148,6 +148,13 @@ async def get_movies():
     """Возвращает список всех фильмов"""
     return movies_data
 
+@app.get("/movies/favorites", response_model=List[Movie])
+async def get_favorite_movies():
+    """Возвращает список избранных фильмов"""
+    favorite_movies = [movie for movie in movies_data if movie["is_favorite"]]
+    return favorite_movies
+
+
 
 @app.get("/movies/{movie_id}", response_model=Movie)
 async def get_movie(movie_id: int):

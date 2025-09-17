@@ -2,21 +2,20 @@ import { Box, Button, Flex, Heading, Icon, Image, Text} from "@chakra-ui/react";
 import { FaRegStar, FaStar } from "react-icons/fa";
 import { useParams, Link } from "react-router";
 import filmsList from "../components/filmsList";
-import { useFavorites } from "../components/useFavorites";
 import genresList from "../components/genresList";
 import { GoClock } from "react-icons/go";
 
 export default function FilmPage() {
   const param = useParams();
   
-  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-  const handleFavoriteClick = (film) => {
-      if (isFavorite(film.id)) {
-          removeFromFavorites(film.id);
-      } else {
-          addToFavorites(film);
-      }
-  };
+  // const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  // const handleFavoriteClick = (film) => {
+  //     if (isFavorite(film.id)) {
+  //         removeFromFavorites(film.id);
+  //     } else {
+  //         addToFavorites(film);
+  //     }
+  // };
 
   const film = filmsList[param.id - 1]
 
@@ -35,12 +34,12 @@ export default function FilmPage() {
       <Flex direction="column">
         <Flex justify={"space-between"} align={"center"} w="625px" mb="20px">
           <Heading fontSize="40px" fontWeight="bold"> {film.title} </Heading>
-          <Icon 
+          {/* <Icon 
               color={"#F9A62B"} 
               cursor="pointer"
               onClick={() => handleFavoriteClick(film)}
               as={isFavorite(film.id) ? FaStar : FaRegStar}
-          />
+          /> */}
         </Flex>
         <Flex align={"center"} w="625px" mb="20px" gap="10px">
           <Box bg={`${genreMap.get(film.genre) || "black"}.100`} rounded={"20px"} mr="15px">
