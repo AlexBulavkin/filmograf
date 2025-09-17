@@ -1,12 +1,79 @@
-# React + Vite
+🎬 Фильмотека
+Проект для управления коллекцией фильмов с React фронтендом и FastAPI бэкендом.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🚀 Быстрый старт
+Предварительные требования
+Node.js 16 или выше
 
-Currently, two official plugins are available:
+Python 3.8 или выше
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+npm или yarn
 
-## Expanding the ESLint configuration
+1. Клонирование репозитория
+git clone <your-repo-url>
+cd filmoteka
+2. Запуск бэкенда (FastAPI)
+# Переходим в папку бэкенда
+cd backend
+# Создаем виртуальное окружение
+python -m venv venv
+# Активируем виртуальное окружение
+# Для Windows:
+venv\Scripts\activate
+# Для MacOS/Linux:
+source venv/bin/activate
+# Устанавливаем зависимости
+pip install -r requirements.txt
+# Запускаем сервер
+uvicorn main:app --reload
+📊 Бэкенд будет доступен по адресу: http://localhost:8000
+📖 Документация API: http://localhost:8000/docs
+🔄 Автоматическая перезагрузка при изменениях
+3. Запуск фронтенда (React + Vite)
+# Открываем новое окно терминала
+# Переходим в папку фронтенда
+cd frontend
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# Устанавливаем зависимости
+npm install
+
+# Запускаем dev сервер
+npm run dev
+🌐 Фронтенд будет доступен по адресу: http://localhost:5173
+⚡ Горячая перезагрузка при изменениях
+
+🛠 Технологии
+Фронтенд
+⚡ Vite — быстрый сборщик
+
+⚛️ React 18 — UI библиотека
+
+🎨 Chakra UI — система компонентов
+
+📋 React Hook Form — управление формами
+
+🔄 Axios — HTTP клиент
+
+Бэкенд
+🐍 FastAPI — современный Python фреймворк
+
+🎯 Pydantic — валидация данных
+
+🌐 Uvicorn — ASGI сервер
+
+🛡️ CORS — кросс-доменные запросы
+
+📋 Функциональность
+✅ Просмотр списка фильмов
+
+✅ Добавление в избранное
+
+✅ Фильтрация по жанрам
+
+✅ Поиск фильмов
+
+✅ Отображение постеров
+
+✅ Информация о длительности
+
+✅ Адаптивный интерфейс

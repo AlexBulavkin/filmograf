@@ -1,8 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import os
 
 app = FastAPI(title="Movie API", version="1.0.0")
@@ -31,6 +31,24 @@ class Movie(BaseModel):
     description: str
     is_favorite: bool
     image_url: str
+
+
+class MovieCreate(BaseModel):
+    title: str
+    genre: str
+    duration: int  
+    description: str
+    is_favorite: bool = False
+    image_url: str
+
+
+class MovieUpdate(BaseModel):
+    title: Optional[str] = None
+    genre: Optional[str] = None
+    duration: Optional[int] = None
+    description: Optional[str] = None
+    is_favorite: Optional[bool] = None
+    image_url: Optional[str] = None
 
 
 movies_data = [
@@ -117,10 +135,19 @@ movies_data = [
     }
 ]
 
+
+def get_next_id():
+    """Генерирует следующий ID для нового фильма"""
+    if not movies_data:
+        return 1
+    return max(movie["id"] for movie in movies_data) + 1
+
+
 @app.get("/movies", response_model=List[Movie])
 async def get_movies():
     """Возвращает список всех фильмов"""
     return movies_data
+
 
 @app.get("/movies/{movie_id}", response_model=Movie)
 async def get_movie(movie_id: int):
@@ -128,11 +155,82 @@ async def get_movie(movie_id: int):
     for movie in movies_data:
         if movie["id"] == movie_id:
             return movie
-    return {"error": "Фильм не найден"}
+    raise HTTPException(status_code=404, detail="Фильм не найден")
+
+
+@app.post("/movies", response_model=Movie)
+async def create_movie(movie: MovieCreate):
+    """Создает новый фильм"""
+    new_movie = {
+        "id": get_next_id(),
+        "title": movie.title,
+        "genre": movie.genre,
+        "duration": movie.duration,
+        "description": movie.description,
+        "is_favorite": movie.is_favorite,
+        "image_url": movie.image_url
+    }
+    movies_data.append(new_movie)
+    return new_movie
+
+
+@app.put("/movies/{movie_id}", response_model=Movie)
+async def update_movie(movie_id: int, movie_update: MovieUpdate):
+    """Полностью обновляет фильм"""
+    for index, movie in enumerate(movies_data):
+        if movie["id"] == movie_id:
+            updated_movie = {
+                "id": movie_id,
+                "title": movie_update.title if movie_update.title is not None else movie["title"],
+                "genre": movie_update.genre if movie_update.genre is not None else movie["genre"],
+                "duration": movie_update.duration if movie_update.duration is not None else movie["duration"],
+                "description": movie_update.description if movie_update.description is not None else movie["description"],
+                "is_favorite": movie_update.is_favorite if movie_update.is_favorite is not None else movie["is_favorite"],
+                "image_url": movie_update.image_url if movie_update.image_url is not None else movie["image_url"]
+            }
+            movies_data[index] = updated_movie
+            return updated_movie
+    raise HTTPException(status_code=404, detail="Фильм не найден")
+
+
+@app.patch("/movies/{movie_id}", response_model=Movie)
+async def partial_update_movie(movie_id: int, movie_update: MovieUpdate):
+    """Частично обновляет фильм"""
+    for index, movie in enumerate(movies_data):
+        if movie["id"] == movie_id:
+            updated_movie = movie.copy()
+            if movie_update.title is not None:
+                updated_movie["title"] = movie_update.title
+            if movie_update.genre is not None:
+                updated_movie["genre"] = movie_update.genre
+            if movie_update.duration is not None:
+                updated_movie["duration"] = movie_update.duration
+            if movie_update.description is not None:
+                updated_movie["description"] = movie_update.description
+            if movie_update.is_favorite is not None:
+                updated_movie["is_favorite"] = movie_update.is_favorite
+            if movie_update.image_url is not None:
+                updated_movie["image_url"] = movie_update.image_url
+            
+            movies_data[index] = updated_movie
+            return updated_movie
+    raise HTTPException(status_code=404, detail="Фильм не найден")
+
+
+@app.delete("/movies/{movie_id}")
+async def delete_movie(movie_id: int):
+    """Удаляет фильм"""
+    for index, movie in enumerate(movies_data):
+        if movie["id"] == movie_id:
+            deleted_movie = movies_data.pop(index)
+            return {"message": f"Фильм '{deleted_movie['title']}' удален", "deleted_movie": deleted_movie}
+    raise HTTPException(status_code=404, detail="Фильм не найден")
+
 
 @app.get("/")
 async def root():
     return {"message": "Movie API работает! Перейдите на /movies для получения списка фильмов"}
+
 
 if __name__ == "__main__":
     import uvicorn
